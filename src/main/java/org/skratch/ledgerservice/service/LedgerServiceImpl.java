@@ -15,7 +15,6 @@ import org.skratch.ledgerservice.repository.LedgerEntryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -39,13 +38,11 @@ public class LedgerServiceImpl implements LedgerService {
                     request.getTransferId(), true, "Duplicate transferId – no changes applied");
         }
 
-        // ✅ Lock accounts (fail if not found)
         Account from = accountRepository.findByIdForUpdate(request.getFromAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("From account not found: " + request.getFromAccountId()));
         Account to = accountRepository.findByIdForUpdate(request.getToAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("To account not found: " + request.getToAccountId()));
 
-        // ✅ Prevent overdraft
         if (from.getBalance().compareTo(request.getAmount()) < 0) {
             log.warn("Insufficient funds: fromAccountId={} balance={} attemptedAmount={}",
                     from.getId(), from.getBalance(), request.getAmount());
@@ -59,13 +56,11 @@ public class LedgerServiceImpl implements LedgerService {
         accountRepository.save(from);
         accountRepository.save(to);
 
-        // ✅ Insert DEBIT entry
         LedgerEntry debit = ledgerTransferMapper.toDebitEntity(request);
         debit.setTransferId(request.getTransferId());
         debit.setAccountId(from.getId());
         ledgerEntryRepository.save(debit);
 
-        // ✅ Insert CREDIT entry
         LedgerEntry credit = ledgerTransferMapper.toCreditEntity(request);
         credit.setTransferId(request.getTransferId());
         credit.setAccountId(to.getId());
