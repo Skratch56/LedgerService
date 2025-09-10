@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    build: ./db
+    container_name: ledger-db
+    networks:
+      - payments-net
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: paymentsdb
+      POSTGRES_USER: payments_user
+      POSTGRES_PASSWORD: payments_pass
+
+  ledger-service:
+    build: .
+    container_name: ledger-service
+    depends_on:
+      - db
+    networks:
+      - payments-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/paymentsdb
+      SPRING_DATASOURCE_USERNAME: payments_user
+      SPRING_DATASOURCE_PASSWORD: payments_pass
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+
+networks:
+  payments-net:
+    external: true
