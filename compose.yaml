@@ -2,7 +2,7 @@ version: "3.9"
 services:
   db:
     build: ./db
-    container_name: payments-db
+    container_name: ledger-db
     ports:
       - "5432:5432"
     environment:

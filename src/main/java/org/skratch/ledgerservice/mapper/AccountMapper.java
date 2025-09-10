@@ -10,8 +10,9 @@ import org.skratch.ledgerservice.model.Account;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface AccountMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "version", constant = "0")
+    @Mapping(target = "version", constant = "0l")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "balance", source = "initialBalance")
     Account toEntity(CreateAccountRequest dto);
 
     AccountResponse toAccountResponse(Account account);

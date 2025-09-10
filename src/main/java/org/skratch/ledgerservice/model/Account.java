@@ -23,7 +23,7 @@ public class Account {
     private Long id;
 
     @Column(nullable = false, precision = 19, scale = 2)
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Version
     private Long version;   // used for optimistic locking

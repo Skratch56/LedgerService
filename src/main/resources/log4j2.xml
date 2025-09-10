@@ -10,12 +10,12 @@
     <Appenders>
         <!-- Console appender for logs in terminal -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{${LOG_LEVEL_PATTERN}} %clr{${sys:PID}}{magenta} %clr{---}{faint} [@project.artifactId@-@project.version@] %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{[%X{traceId}]}{faint} %clr{:}{faint}  %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}" />
+            <PatternLayout pattern="%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{${LOG_LEVEL_PATTERN}} %clr{${sys:PID}}{magenta} %clr{---}{faint} [@project.artifactId@-@project.version@] %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{[%X{traceId}]}{faint} %clr{:}{faint}  %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD} [%X{correlationId}] " />
         </Console>
 
         <!-- File appender to log into a single file -->
         <File name="File" fileName="${log-path}/${logfile-name}.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN} ${sys:PID} --- [@project.artifactId@-@project.version@] [%15.15t] %c %X{traceId} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}" />
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN} ${sys:PID} [%X{correlationId}]--- [@project.artifactId@-@project.version@] [%15.15t] %c %X{traceId} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}" />
         </File>
     </Appenders>
 

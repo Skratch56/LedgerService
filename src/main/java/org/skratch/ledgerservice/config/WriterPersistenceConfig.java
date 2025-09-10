@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -26,22 +27,20 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"org.skratch.ledgerservice.repository"}, entityManagerFactoryRef = "writerEntityManagerFactory")
 @RequiredArgsConstructor
+@Profile("!test")
 public class WriterPersistenceConfig {
 
     private final Properties config;
 
     @Bean(name = "writerUrl")
     public String getWriterDatabaseUrl() {
-        return "jdbc:sqlserver://" +
+        return "jdbc:postgresql://" +
                config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_HOST) +
                ":" +
                config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_PORT) +
-               ";databaseName=" +
+               "/" +
                config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_DATABASE) +
-               ";encrypt=" +
-               config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_ENCRYPT, "true") +
-               ";trustServerCertificate=" +
-               config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_TRUST_SERVER_CERTIFICATE, "true");
+               "?ssl=false";
     }
 
     @Bean
@@ -87,13 +86,17 @@ public class WriterPersistenceConfig {
     }
 
     private Properties additionalProperties(String writerUrl) {
-        return DatabasePropertyFactory.build(
-                DatabasePropertyFactory.Role.WRITER,
-                writerUrl,
-                config,
-                PersistenceConstants.DATABASE_DIALECT,
-                PersistenceConstants.DATABASE_NAMING,
-                PersistenceConstants.DATABASE_PROVIDER
-        );
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.connection.url", writerUrl);
+        properties.setProperty("hibernate.connection.username", config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_USERNAME));
+        properties.setProperty("hibernate.connection.password", config.getProperty(DatabasePropertyKeys.SPRING_DATASOURCE_PASSWORD));
+        properties.setProperty("hibernate.hbm2ddl.auto", "validate");
+        properties.setProperty("hibernate.show_sql", "false");
+        properties.setProperty("hibernate.format_sql", "false");
+        properties.setProperty("hibernate.use_sql_comments", "false");
+        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+        properties.setProperty("hibernate.enable_lazy_load_no_trans", "true");
+
+        return properties;
     }
 }

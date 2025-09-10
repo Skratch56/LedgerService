@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ledger_entries", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"transfer_id"})
+        @UniqueConstraint(columnNames = {"transfer_id", "type"})
 })
 @Data
 public class LedgerEntry {
@@ -26,7 +26,7 @@ public class LedgerEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "transfer_id", nullable = false, unique = true)
+    @Column(name = "transfer_id", nullable = false)
     private String transferId;
 
     @Column(name = "account_id", nullable = false)
